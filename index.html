@@ -6,51 +6,70 @@
 <title>Salim Chart | تحليل الأسواق المالية</title>
 <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, "Segoe UI", Tahoma, sans-serif; }
-  body { background:#0b0f17; color:#e6edf3; min-height:100vh; }
-  header { padding:14px 16px; background:#111827; border-bottom:1px solid #1f2937; display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; }
-  .brand { font-weight:800; font-size:20px; color:#22d3ee; }
-  .brand span { color:#e6edf3; }
-  .tag { font-size:12px; color:#94a3b8; }
-  main { padding:14px; max-width:1200px; margin:auto; }
-  .toolbar { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px; }
-  select, input, button { background:#111827; color:#e6edf3; border:1px solid #1f2937; border-radius:10px; padding:10px 12px; font-size:14px; }
-  button { cursor:pointer; }
-  button.active { background:#22d3ee; color:#04202a; border-color:#22d3ee; font-weight:700; }
-  .grid { display:grid; grid-template-columns:1fr; gap:14px; }
-  @media(min-width:900px){ .grid { grid-template-columns:2fr 1fr; } }
-  .card { background:#111827; border:1px solid #1f2937; border-radius:14px; padding:14px; }
-  .card h2 { font-size:16px; margin-bottom:10px; color:#22d3ee; }
-  #chart { width:100%; height:420px; }
-  .stats { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; margin-top:12px; }
-  .stat { background:#0b0f17; border:1px solid #1f2937; border-radius:10px; padding:10px; }
-  .stat b { display:block; font-size:18px; }
-  .up { color:#22c55e; } .down { color:#ef4444; }
-  .row { display:flex; justify-content:space-between; align-items:center; gap:8px; padding:10px 0; border-bottom:1px solid #1f2937; }
-  .row:last-child { border-bottom:0; }
-  .small { font-size:12px; color:#94a3b8; }
-  .danger { color:#ef4444; }
-  .muted { color:#94a3b8; font-size:12px; margin-top:8px; }
-  footer { padding:18px; text-align:center; color:#64748b; font-size:12px; }
+  :root{--bg:#0b0f17;--card:#111827;--line:#1f2937;--text:#e6edf3;--muted:#94a3b8;--accent:#22d3ee;--accentText:#04202a;--grid:#161e2c}
+  :root[data-theme="light"]{--bg:#f4f6fa;--card:#ffffff;--line:#d9dfe8;--text:#111827;--muted:#5b6678;--accent:#0891b2;--accentText:#ffffff;--grid:#eef1f6}
+  *{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif}
+  body{background:var(--bg);color:var(--text);min-height:100vh}
+  header{padding:12px 14px;background:var(--card);border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .brand{font-weight:800;font-size:20px;color:var(--accent)}.brand span{color:var(--text)}
+  .tag{font-size:11px;color:var(--muted)}
+  main{padding:10px;max-width:1200px;margin:auto}
+  .bar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;align-items:center}
+  .bar .label{font-size:12px;color:var(--muted);margin-inline-end:2px}
+  select,input,button{background:var(--card);color:var(--text);border:1px solid var(--line);border-radius:10px;padding:9px 11px;font-size:14px}
+  button{cursor:pointer}
+  button.on{background:var(--accent);color:var(--accentText);border-color:var(--accent);font-weight:700}
+  .grid{display:grid;grid-template-columns:1fr;gap:12px}
+  @media(min-width:900px){.grid{grid-template-columns:2fr 1fr}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px}
+  .card h2{font-size:15px;margin-bottom:8px;color:var(--accent)}
+  #chart{width:100%;height:max(420px,62vh)}
+  .stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px}
+  @media(min-width:600px){.stats{grid-template-columns:repeat(4,1fr)}}
+  .stat{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px}
+  .stat b{display:block;font-size:17px;direction:ltr;text-align:right}
+  .up{color:#16a34a}.down{color:#ef4444}
+  .row{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid var(--line)}
+  .row:last-child{border-bottom:0}
+  .small{font-size:12px;color:var(--muted)}
+  .del{color:#ef4444}
+  .muted{color:var(--muted);font-size:12px;margin-top:8px}
+  .ltr{direction:ltr;unicode-bidi:isolate;display:inline-block}
+  footer{padding:16px;text-align:center;color:var(--muted);font-size:12px;line-height:1.9}
+  footer a{color:var(--accent)}
 </style>
 </head>
 <body>
-
 <header>
-  <div>
-    <div class="brand">Salim <span>Chart</span></div>
-    <div class="tag">منصة تحليل الأسواق المالية</div>
+  <div><div class="brand">Salim <span>Chart</span></div><div class="tag">منصة تحليل الأسواق المالية</div></div>
+  <div style="display:flex;gap:8px;align-items:center">
+    <div class="tag">بيانات محاكاة</div>
+    <button id="themeBtn" title="تبديل الوضع">🌓</button>
   </div>
-  <div class="tag">نسخة تجريبية • بيانات محاكاة</div>
 </header>
 
 <main>
-  <div class="toolbar">
+  <div class="bar">
     <select id="symbolSelect"></select>
-    <button data-ind="sma" class="active">SMA</button>
+    <button id="addWatch">+ مراقبة</button>
+  </div>
+  <div class="bar">
+    <span class="label">الفترة</span>
+    <button data-tf="D">يومي</button>
+    <button data-tf="W">أسبوعي</button>
+    <button data-tf="M">شهري</button>
+  </div>
+  <div class="bar">
+    <span class="label">على الرسم</span>
+    <button data-ind="sma">SMA</button>
     <button data-ind="ema">EMA</button>
-    <button data-ind="rsi">RSI</button>
-    <button id="refreshBtn">تحديث</button>
+    <button data-ind="bb">Bollinger</button>
+  </div>
+  <div class="bar">
+    <span class="label">مؤشر سفلي</span>
+    <button data-low="none">بدون</button>
+    <button data-low="rsi">RSI</button>
+    <button data-low="macd">MACD</button>
   </div>
 
   <div class="grid">
@@ -63,7 +82,7 @@
         <div class="stat"><span class="small">أعلى سعر</span><b id="high">--</b></div>
         <div class="stat"><span class="small">أدنى سعر</span><b id="low">--</b></div>
       </div>
-      <p class="muted">هذه نسخة تجريبية وتستخدم بيانات محاكاة لأغراض العرض فقط، وليست توصية استثمارية.</p>
+      <p class="muted">بيانات محاكاة لأغراض العرض فقط، وليست توصية استثمارية.</p>
     </section>
 
     <aside>
@@ -71,284 +90,245 @@
         <h2>قائمة المراقبة</h2>
         <div id="watchlist"></div>
       </section>
-
-      <section class="card" style="margin-top:14px">
+      <section class="card" style="margin-top:12px">
         <h2>تنبيه سعري</h2>
-        <input id="alertPrice" type="number" placeholder="أدخل السعر المستهدف" />
-        <button id="addAlert" style="width:100%;margin-top:10px">إضافة تنبيه</button>
-        <div id="alerts" style="margin-top:12px"></div>
+        <input id="alertPrice" type="number" inputmode="decimal" placeholder="السعر المستهدف" style="width:100%" />
+        <button id="addAlert" style="width:100%;margin-top:8px">إضافة تنبيه</button>
+        <div id="alerts" style="margin-top:10px"></div>
       </section>
     </aside>
   </div>
 </main>
 
 <footer>
-  Salim Chart • أداة تحليل وليست توصية استثمارية
+  Salim Chart • أداة تحليل وليست توصية استثمارية<br>
+  الرسم البياني يعمل بمكتبة Lightweight Charts™ مفتوحة المصدر من
+  <a href="https://www.tradingview.com/" target="_blank" rel="noopener">TradingView</a>
+  (ترخيص Apache 2.0).
 </footer>
 
 <script>
-const symbols = [
-  { id:"AAPL", name:"Apple", base:190 },
-  { id:"TSLA", name:"Tesla", base:250 },
-  { id:"MSFT", name:"Microsoft", base:420 },
-  { id:"NVDA", name:"NVIDIA", base:130 },
-  { id:"BTCUSD", name:"Bitcoin", base:68000 },
-  { id:"ETHUSD", name:"Ethereum", base:3500 }
+const symbols=[
+  {id:"AAPL",name:"Apple",base:190},
+  {id:"TSLA",name:"Tesla",base:250},
+  {id:"MSFT",name:"Microsoft",base:420},
+  {id:"NVDA",name:"NVIDIA",base:130},
+  {id:"BTCUSD",name:"Bitcoin",base:68000},
+  {id:"ETHUSD",name:"Ethereum",base:3500}
 ];
+const $=id=>document.getElementById(id);
+const store=(k,d)=>d===undefined?JSON.parse(localStorage.getItem(k)||"[]"):localStorage.setItem(k,JSON.stringify(d));
 
-let currentSymbol = symbols[0];
-let candles = [];
-let indicators = { sma:true, ema:false, rsi:false };
-let chart, candleSeries, smaSeries, emaSeries, rsiSeries;
+const defaults={symbol:"AAPL",tf:"D",low:"rsi",theme:"dark",ind:{sma:true,ema:false,bb:false}};
+let saved={};
+try{saved=JSON.parse(localStorage.getItem("salim_prefs")||"{}")}catch(e){}
+const prefs={...defaults,...saved,ind:{...defaults.ind,...(saved.ind||{})}};
+const savePrefs=()=>localStorage.setItem("salim_prefs",JSON.stringify(prefs));
 
-const select = document.getElementById("symbolSelect");
-const watchlist = document.getElementById("watchlist");
-const alertsBox = document.getElementById("alerts");
+let cur=symbols.find(s=>s.id===prefs.symbol)||symbols[0];
+let daily=[],candles=[];
+let chart,cs,sma20,ema20,bbU,bbM,bbL,rsiS,macdS,sigS,histS,rsi70,rsi30;
 
-symbols.forEach(s => {
-  const option = document.createElement("option");
-  option.value = s.id;
-  option.textContent = `${s.name} (${s.id})`;
-  select.appendChild(option);
-});
+const sel=$("symbolSelect");
+symbols.forEach(s=>{const o=document.createElement("option");o.value=s.id;o.textContent=s.name+" ("+s.id+")";sel.appendChild(o)});
+sel.value=cur.id;
 
-function seededRandom(seed) {
-  let value = seed;
-  return function() {
-    value = (value * 9301 + 49297) % 233280;
-    return value / 233280;
+function rng(seed){let v=seed;return()=>{v=(v*9301+49297)%233280;return v/233280}}
+function fmtDate(d){return d.toISOString().slice(0,10)}
+
+function gen(s){
+  const r=rng(s.id.split("").reduce((a,c)=>a+c.charCodeAt(0),0));
+  let p=s.base;const out=[];
+  const end=new Date();end.setUTCHours(0,0,0,0);
+  const days=[];let d=new Date(end);
+  while(days.length<700){const w=d.getUTCDay();if(w!==0&&w!==6)days.push(fmtDate(d));d=new Date(d.getTime()-864e5)}
+  days.reverse();
+  days.forEach(t=>{
+    const o=p,c=p+(r()-0.5)*s.base*0.03;
+    const h=Math.max(o,c)+r()*s.base*0.01,l=Math.min(o,c)-r()*s.base*0.01;
+    out.push({time:t,open:o,high:h,low:l,close:c});p=c;
+  });
+  return out;
+}
+
+function aggregate(data,mode){
+  if(mode==="D")return data;
+  const map=new Map();
+  data.forEach(c=>{
+    const d=new Date(c.time+"T00:00:00Z");let key;
+    if(mode==="M")key=c.time.slice(0,7);
+    else{const day=(d.getUTCDay()+6)%7;key=fmtDate(new Date(d.getTime()-day*864e5))}
+    const g=map.get(key);
+    if(!g)map.set(key,{time:c.time,open:c.open,high:c.high,low:c.low,close:c.close});
+    else{g.high=Math.max(g.high,c.high);g.low=Math.min(g.low,c.low);g.close=c.close}
+  });
+  return [...map.values()];
+}
+
+function smaCalc(d,n){const r=[];let sum=0;
+  for(let i=0;i<d.length;i++){sum+=d[i].close;if(i>=n)sum-=d[i-n].close;if(i>=n-1)r.push({time:d[i].time,value:sum/n})}
+  return r}
+function emaArr(vals,n){const k=2/(n+1);const out=[];let e=vals[0];
+  vals.forEach((v,i)=>{e=i===0?v:v*k+e*(1-k);out.push(e)});return out}
+function emaCalc(d,n){const e=emaArr(d.map(c=>c.close),n);return d.map((c,i)=>({time:c.time,value:e[i]})).slice(n-1)}
+function bbCalc(d,n=20,m=2){const U=[],M=[],L=[];
+  for(let i=n-1;i<d.length;i++){
+    const s=d.slice(i-n+1,i+1).map(c=>c.close);
+    const mean=s.reduce((a,b)=>a+b,0)/n;
+    const sd=Math.sqrt(s.reduce((a,b)=>a+(b-mean)**2,0)/n);
+    U.push({time:d[i].time,value:mean+m*sd});M.push({time:d[i].time,value:mean});L.push({time:d[i].time,value:mean-m*sd});
+  }
+  return{U,M,L}}
+function rsiCalc(d,n=14){
+  const r=[];if(d.length<=n)return r;
+  let g=0,l=0;
+  for(let i=1;i<=n;i++){const df=d[i].close-d[i-1].close;g+=Math.max(df,0);l+=Math.max(-df,0)}
+  g/=n;l/=n;
+  r.push({time:d[n].time,value:l===0?100:100-100/(1+g/l)});
+  for(let i=n+1;i<d.length;i++){
+    const df=d[i].close-d[i-1].close;
+    g=(g*(n-1)+Math.max(df,0))/n;l=(l*(n-1)+Math.max(-df,0))/n;
+    r.push({time:d[i].time,value:l===0?100:100-100/(1+g/l)});
+  }
+  return r}
+function macdCalc(d){
+  const c=d.map(x=>x.close),e12=emaArr(c,12),e26=emaArr(c,26);
+  const m=c.map((_,i)=>e12[i]-e26[i]),sg=emaArr(m,9);
+  const M=[],S=[],H=[];
+  for(let i=26;i<d.length;i++){
+    M.push({time:d[i].time,value:m[i]});S.push({time:d[i].time,value:sg[i]});
+    const h=m[i]-sg[i];H.push({time:d[i].time,value:h,color:h>=0?"rgba(34,197,94,.6)":"rgba(239,68,68,.6)"});
+  }
+  return{M,S,H}}
+
+function chartColors(){
+  const light=prefs.theme==="light";
+  return{
+    layout:{background:{color:light?"#ffffff":"#0b0f17"},textColor:light?"#5b6678":"#94a3b8"},
+    grid:{vertLines:{color:light?"#eef1f6":"#161e2c"},horzLines:{color:light?"#eef1f6":"#161e2c"}},
+    rightPriceScale:{borderColor:light?"#d9dfe8":"#1f2937"},
+    timeScale:{borderColor:light?"#d9dfe8":"#1f2937"}
   };
 }
 
-function generateCandles(symbol) {
-  const random = seededRandom(symbol.id.split("").reduce((a,c)=>a+c.charCodeAt(0),0));
-  let price = symbol.base;
-  const result = [];
+function initChart(){
+  chart=LightweightCharts.createChart($("chart"),{...chartColors(),crosshair:{mode:0}});
+  cs=chart.addCandlestickSeries({upColor:"#22c55e",downColor:"#ef4444",borderUpColor:"#22c55e",borderDownColor:"#ef4444",wickUpColor:"#22c55e",wickDownColor:"#ef4444"});
+  const ln=(c,w=2,extra={})=>chart.addLineSeries({color:c,lineWidth:w,priceLineVisible:false,lastValueVisible:false,...extra});
+  sma20=ln("#06b6d4");ema20=ln("#a78bfa");
+  bbU=ln("#64748b",1);bbM=ln("#64748b",1,{lineStyle:2});bbL=ln("#64748b",1);
+  const lo={priceScaleId:"low"};
+  rsiS=ln("#f59e0b",2,{...lo,lastValueVisible:true});
+  rsi70=ln("#94a3b8",1,{...lo,lineStyle:2});rsi30=ln("#94a3b8",1,{...lo,lineStyle:2});
+  macdS=ln("#06b6d4",2,lo);sigS=ln("#f59e0b",2,lo);
+  histS=chart.addHistogramSeries({priceScaleId:"low",priceLineVisible:false,lastValueVisible:false});
+  new ResizeObserver(()=>chart.applyOptions({width:$("chart").clientWidth})).observe($("chart"));
+}
 
-  for (let i=0; i<180; i++) {
-    const change = (random() - 0.5) * symbol.base * 0.03;
-    const open = price;
-    const close = price + change;
-    const high = Math.max(open, close) + random() * symbol.base * 0.01;
-    const low = Math.min(open, close) - random() * symbol.base * 0.01;
-    const volume = 100000 + random() * 900000;
+function render(){
+  candles=aggregate(daily,prefs.tf);
+  cs.setData(candles);
+  sma20.setData(prefs.ind.sma?smaCalc(candles,20):[]);
+  ema20.setData(prefs.ind.ema?emaCalc(candles,20):[]);
+  if(prefs.ind.bb){const b=bbCalc(candles);bbU.setData(b.U);bbM.setData(b.M);bbL.setData(b.L)}
+  else{bbU.setData([]);bbM.setData([]);bbL.setData([])}
 
-    result.push({
-      time: Math.floor(Date.now() / 1000) - (180 - i) * 86400,
-      open, high, low, close, volume
-    });
+  const hasLow=prefs.low!=="none";
+  chart.priceScale("right").applyOptions({scaleMargins:{top:0.05,bottom:hasLow?0.32:0.05}});
+  chart.priceScale("low").applyOptions({scaleMargins:{top:0.72,bottom:0.02},visible:hasLow});
 
-    price = close;
+  rsiS.setData([]);rsi70.setData([]);rsi30.setData([]);macdS.setData([]);sigS.setData([]);histS.setData([]);
+  if(prefs.low==="rsi"){
+    const r=rsiCalc(candles);rsiS.setData(r);
+    if(r.length){rsi70.setData([{time:r[0].time,value:70},{time:r[r.length-1].time,value:70}]);
+      rsi30.setData([{time:r[0].time,value:30},{time:r[r.length-1].time,value:30}])}
+  }else if(prefs.low==="macd"){
+    const m=macdCalc(candles);macdS.setData(m.M);sigS.setData(m.S);histS.setData(m.H);
   }
-
-  return result;
-}
-
-function sma(data, period=20) {
-  const result = [];
-  for (let i=period-1; i<data.length; i++) {
-    const slice = data.slice(i-period+1, i+1);
-    result.push({ time:data[i].time, value:slice.reduce((s,c)=>s+c.close,0)/period });
-  }
-  return result;
-}
-
-function ema(data, period=20) {
-  const k = 2/(period+1);
-  let emaValue = data[0].close;
-  const result = [];
-
-  data.forEach((candle, index) => {
-    emaValue = candle.close * k + emaValue * (1-k);
-    if (index >= period-1) result.push({ time:candle.time, value:emaValue });
-  });
-
-  return result;
-}
-
-function rsi(data, period=14) {
-  const result = [];
-  let gains=0, losses=0;
-
-  for (let i=1; i<data.length; i++) {
-    const diff = data[i].close - data[i-1].close;
-    const gain = Math.max(diff,0);
-    const loss = Math.max(-diff,0);
-
-    if (i <= period) {
-      gains += gain;
-      losses += loss;
-    }
-
-    if (i === period) {
-      const avgGain = gains/period;
-      const avgLoss = losses/period;
-      const rs = avgLoss === 0 ? 100 : avgGain/avgLoss;
-      result.push({ time:data[i].time, value:100 - (100/(1+rs)) });
-    }
-
-    if (i > period) {
-      const prev = result[result.length-1].value;
-      const avgGain = (gains*(period-1)+gain)/period;
-      const avgLoss = (losses*(period-1)+loss)/period;
-      const rs = avgLoss === 0 ? 100 : avgGain/avgLoss;
-      const value = 100 - (100/(1+rs));
-      result.push({ time:data[i].time, value });
-      gains = avgGain*period;
-      losses = avgLoss*period;
-    }
-  }
-
-  return result;
-}
-
-function initChart() {
-  chart = LightweightCharts.createChart(document.getElementById("chart"), {
-    layout:{ background:{ color:"#0b0f17" }, textColor:"#94a3b8" },
-    grid:{ vertLines:{ color:"#1f2937" }, horzLines:{ color:"#1f2937" } },
-    rightPriceScale:{ borderColor:"#1f2937" },
-    timeScale:{ borderColor:"#1f2937" }
-  });
-
-  candleSeries = chart.addCandlestickSeries({
-    upColor:"#22c55e", downColor:"#ef4444",
-    borderUpColor:"#22c55e", borderDownColor:"#ef4444",
-    wickUpColor:"#22c55e", wickDownColor:"#ef4444"
-  });
-
-  smaSeries = chart.addLineSeries({ color:"#22d3ee", lineWidth:2 });
-  emaSeries = chart.addLineSeries({ color:"#a78bfa", lineWidth:2 });
-  rsiSeries = chart.addLineSeries({ color:"#f59e0b", lineWidth:2 });
-}
-
-function updateChart() {
-  candleSeries.setData(candles);
-  smaSeries.setData(indicators.sma ? sma(candles) : []);
-  emaSeries.setData(indicators.ema ? ema(candles) : []);
-  rsiSeries.setData(indicators.rsi ? rsi(candles) : []);
   chart.timeScale().fitContent();
+  stats();checkAlerts();
 }
 
-function updateStats() {
-  const last = candles[candles.length-1];
-  const first = candles[0];
-  const change = ((last.close - first.close)/first.close)*100;
-
-  document.getElementById("chartTitle").textContent = `${currentSymbol.name} (${currentSymbol.id})`;
-  document.getElementById("price").textContent = last.close.toFixed(2);
-  document.getElementById("change").textContent = `${change.toFixed(2)}%`;
-  document.getElementById("change").className = change >= 0 ? "up" : "down";
-  document.getElementById("high").textContent = Math.max(...candles.map(c=>c.high)).toFixed(2);
-  document.getElementById("low").textContent = Math.min(...candles.map(c=>c.low)).toFixed(2);
+function stats(){
+  const last=candles[candles.length-1],first=candles[0];
+  const ch=(last.close-first.close)/first.close*100;
+  $("chartTitle").textContent=cur.name+" ("+cur.id+")";
+  $("price").textContent=last.close.toFixed(2);
+  const sign=ch>=0?"+":"-";
+  $("change").innerHTML='<span class="ltr">'+sign+Math.abs(ch).toFixed(2)+'%</span>';
+  $("change").className=ch>=0?"up":"down";
+  $("high").textContent=Math.max(...candles.map(c=>c.high)).toFixed(2);
+  $("low").textContent=Math.min(...candles.map(c=>c.low)).toFixed(2);
 }
 
-function loadSymbol() {
-  currentSymbol = symbols.find(s => s.id === select.value);
-  candles = generateCandles(currentSymbol);
-  updateChart();
-  updateStats();
-  renderWatchlist();
-  renderAlerts();
+function load(){
+  cur=symbols.find(s=>s.id===sel.value)||symbols[0];
+  prefs.symbol=cur.id;savePrefs();
+  daily=gen(cur);render();renderWatch();renderAlerts();
 }
 
-function getWatchlist() {
-  return JSON.parse(localStorage.getItem("salim_watchlist") || "[]");
-}
-
-function saveWatchlist(list) {
-  localStorage.setItem("salim_watchlist", JSON.stringify(list));
-}
-
-function renderWatchlist() {
-  const list = getWatchlist();
-  watchlist.innerHTML = "";
-
-  if (!list.length) {
-    watchlist.innerHTML = `<p class="small">لا توجد رموز في قائمة المراقبة.</p>`;
-    return;
-  }
-
-  list.forEach(id => {
-    const symbol = symbols.find(s => s.id === id);
-    const row = document.createElement("div");
-    row.className = "row";
-    row.innerHTML = `
-      <div>
-        <b>${symbol.name}</b>
-        <div class="small">${symbol.id}</div>
-      </div>
-      <button class="danger">إزالة</button>
-    `;
-    row.querySelector("button").onclick = () => {
-      saveWatchlist(list.filter(x => x !== id));
-      renderWatchlist();
-    };
-    watchlist.appendChild(row);
+function renderWatch(){
+  const list=store("salim_watchlist");const box=$("watchlist");box.innerHTML="";
+  if(!list.length){box.innerHTML='<p class="small">لا توجد رموز. اضغط «+ مراقبة».</p>';return}
+  list.forEach(id=>{
+    const s=symbols.find(x=>x.id===id);if(!s)return;
+    const last=gen(s).slice(-1)[0].close;
+    const row=document.createElement("div");row.className="row";
+    row.innerHTML='<div><b>'+s.name+'</b><div class="small ltr">'+s.id+' • '+last.toFixed(2)+'</div></div><div><button class="go">عرض</button> <button class="del">إزالة</button></div>';
+    row.querySelector(".go").onclick=()=>{sel.value=id;load();window.scrollTo({top:0,behavior:"smooth"})};
+    row.querySelector(".del").onclick=()=>{store("salim_watchlist",store("salim_watchlist").filter(x=>x!==id));renderWatch()};
+    box.appendChild(row);
   });
 }
 
-function getAlerts() {
-  return JSON.parse(localStorage.getItem("salim_alerts") || "[]");
-}
-
-function saveAlerts(list) {
-  localStorage.setItem("salim_alerts", JSON.stringify(list));
-}
-
-function renderAlerts() {
-  const list = getAlerts().filter(a => a.symbol === currentSymbol.id);
-  alertsBox.innerHTML = "";
-
-  if (!list.length) {
-    alertsBox.innerHTML = `<p class="small">لا توجد تنبيهات لهذا الرمز.</p>`;
-    return;
-  }
-
-  list.forEach(alert => {
-    const row = document.createElement("div");
-    row.className = "row";
-    row.innerHTML = `
-      <div>
-        <b>${alert.price}</b>
-        <div class="small">تنبيه سعري</div>
-      </div>
-      <button class="danger">حذف</button>
-    `;
-    row.querySelector("button").onclick = () => {
-      saveAlerts(getAlerts().filter(x => x.id !== alert.id));
-      renderAlerts();
-    };
-    alertsBox.appendChild(row);
+function renderAlerts(){
+  const list=store("salim_alerts").filter(a=>a.symbol===cur.id);const box=$("alerts");box.innerHTML="";
+  if(!list.length){box.innerHTML='<p class="small">لا توجد تنبيهات لهذا الرمز.</p>';return}
+  list.forEach(a=>{
+    const row=document.createElement("div");row.className="row";
+    row.innerHTML='<div><b class="ltr">'+a.price+'</b><div class="small">'+(a.fired?"تم الوصول إليه":"بانتظار الوصول")+'</div></div><button class="del">حذف</button>';
+    row.querySelector("button").onclick=()=>{store("salim_alerts",store("salim_alerts").filter(x=>x.id!==a.id));renderAlerts()};
+    box.appendChild(row);
   });
 }
 
-document.querySelectorAll("[data-ind]").forEach(button => {
-  button.onclick = () => {
-    const key = button.dataset.ind;
-    indicators[key] = !indicators[key];
-    button.classList.toggle("active", indicators[key]);
-    updateChart();
-  };
-});
+function checkAlerts(){
+  const all=store("salim_alerts");const last=daily[daily.length-1].close;let hit=[];
+  all.forEach(a=>{
+    if(a.symbol!==cur.id||a.fired)return;
+    const ref=a.ref??last;
+    if((ref<a.price&&last>=a.price)||(ref>a.price&&last<=a.price)){a.fired=true;hit.push(a.price)}
+  });
+  if(hit.length){store("salim_alerts",all);setTimeout(()=>alert("تنبيه: وصل "+cur.name+" إلى "+hit.join(" و ")),100);renderAlerts()}
+}
 
-select.onchange = loadSymbol;
+function syncButtons(){
+  document.querySelectorAll("[data-tf]").forEach(b=>b.classList.toggle("on",b.dataset.tf===prefs.tf));
+  document.querySelectorAll("[data-low]").forEach(b=>b.classList.toggle("on",b.dataset.low===prefs.low));
+  document.querySelectorAll("[data-ind]").forEach(b=>b.classList.toggle("on",!!prefs.ind[b.dataset.ind]));
+}
+function applyTheme(){
+  document.documentElement.setAttribute("data-theme",prefs.theme);
+  if(chart)chart.applyOptions(chartColors());
+}
 
-document.getElementById("refreshBtn").onclick = loadSymbol;
+document.querySelectorAll("[data-tf]").forEach(b=>b.onclick=()=>{prefs.tf=b.dataset.tf;savePrefs();syncButtons();render()});
+document.querySelectorAll("[data-ind]").forEach(b=>b.onclick=()=>{const k=b.dataset.ind;prefs.ind[k]=!prefs.ind[k];savePrefs();syncButtons();render()});
+document.querySelectorAll("[data-low]").forEach(b=>b.onclick=()=>{prefs.low=b.dataset.low;savePrefs();syncButtons();render()});
+$("themeBtn").onclick=()=>{prefs.theme=prefs.theme==="dark"?"light":"dark";savePrefs();applyTheme()};
 
-document.getElementById("addAlert").onclick = () => {
-  const price = parseFloat(document.getElementById("alertPrice").value);
-  if (!price || price <= 0) return alert("أدخل سعرًا صحيحًا");
-
-  const list = getAlerts();
-  list.push({ id:Date.now(), symbol:currentSymbol.id, price });
-  saveAlerts(list);
-  document.getElementById("alertPrice").value = "";
-  renderAlerts();
+sel.onchange=load;
+$("addWatch").onclick=()=>{const l=store("salim_watchlist");if(!l.includes(cur.id)){l.push(cur.id);store("salim_watchlist",l)}renderWatch()};
+$("addAlert").onclick=()=>{
+  const p=parseFloat($("alertPrice").value);
+  if(!p||p<=0)return alert("أدخل سعرًا صحيحًا");
+  const l=store("salim_alerts");
+  l.push({id:Date.now(),symbol:cur.id,price:p,ref:daily[daily.length-1].close,fired:false});
+  store("salim_alerts",l);$("alertPrice").value="";renderAlerts();
 };
 
-initChart();
-loadSymbol();
+document.documentElement.setAttribute("data-theme",prefs.theme);
+initChart();syncButtons();load();
 </script>
-
 </body>
 </html>
